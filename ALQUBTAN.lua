@@ -1522,7 +1522,7 @@ local NameChat = NameChat:gsub("`","")
 local NameChat = NameChat:gsub("*","") 
 local NameChat = NameChat:gsub("{","") 
 local NameChat = NameChat:gsub("}","") 
-if not Sudo(msg) then
+if not Sudo(msg) and not Bot(msg) then
 SendText(DevId,"⌁︙تم طرد البوت من المجموعه ↫ ⤈ \n┉ ≈ ┉ ≈ ┉ ≈ ┉ ≈ ┉\n⌁︙بواسطة ↫ "..Name.."\n⌁︙اسم المجموعه ↫ ["..NameChat.."]\n⌁︙ايدي المجموعه ↫ ⤈ \n❨ `"..msg.chat_id_.."` ❩\n┉ ≈ ┉ ≈ ┉ ≈ ┉ ≈ ┉\n⌁︙الوقت ↫ "..os.date("%I:%M%p").."\n⌁︙التاريخ ↫ "..os.date("%Y/%m/%d").."",0,'md')
 end
 end,nil)
@@ -1781,7 +1781,9 @@ end
 if msg.content_.animation_ then DevAbs:set(ALQUBTAN..'Abs:Gif:GpRed'..SaveGpRed..''..msg.chat_id_..'', msg.content_.animation_.animation_.persistent_id_) 
 end 
 if msg.content_.text_ then
-DevAbs:set(ALQUBTAN..'Abs:Text:GpRed'..SaveGpRed..''..msg.chat_id_..'', msg.content_.text_)
+Text = msg.content_.text_ 
+Text = Text:gsub('"',""):gsub('"',""):gsub("`",""):gsub("*",""):gsub("]",""):gsub("[","")
+DevAbs:set(ALQUBTAN..'Abs:Text:GpRed'..SaveGpRed..''..msg.chat_id_..'', Text)
 end 
 Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙تم حفظ الرد الجديد', 1, 'md') 
 DevAbs:del(ALQUBTAN..'Abs:Add:GpText'..msg.sender_user_id_..''..msg.chat_id_..'')
@@ -1818,12 +1820,12 @@ local edit_msg = DevAbs:get(ALQUBTAN..'Abs:EditMsg'..msg.chat_id_..msg.sender_us
 local user_msgs = DevAbs:get(ALQUBTAN..'Abs:UsersMsgs'..msg.chat_id_..':'..msg.sender_user_id_)
 local Text = DevAbs:get(ALQUBTAN..'Abs:Text:GpRed'..msg.content_.text_..''..msg.chat_id_..'')
 local Text = Text:gsub('#username',(username or 'لا يوجد')) 
-local Text = Text:gsub('#name','['..result.first_name_..']')
+local Text = Text:gsub('#name',result.first_name_)
 local Text = Text:gsub('#id',msg.sender_user_id_)
 local Text = Text:gsub('#edit',edit_msg)
 local Text = Text:gsub('#msgs',(user_msgs or 'لا يوجد'))
 local Text = Text:gsub('#stast',(IdRank(msg.sender_user_id_, msg.chat_id_) or 'لا يوجد'))
-Dev_Abs(msg.chat_id_, msg.id_, 1, Text, 'html')
+send(msg.chat_id_,msg.id_,'['..Text..']')
 end
 getUser(msg.sender_user_id_, ALQUBTANTEAM)
 end
@@ -1878,7 +1880,9 @@ if msg.content_.animation_ then
 DevAbs:set(ALQUBTAN.."Abs:Gif:AllRed"..SaveAllRed, msg.content_.animation_.animation_.persistent_id_)
 end
 if msg.content_.text_ then
-DevAbs:set(ALQUBTAN.."Abs:Text:AllRed"..SaveAllRed, msg.content_.text_)
+Text = msg.content_.text_ 
+Text = Text:gsub('"',""):gsub('"',""):gsub("`",""):gsub("*",""):gsub("]",""):gsub("[","")
+DevAbs:set(ALQUBTAN.."Abs:Text:AllRed"..SaveAllRed, Text)
 end 
 Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙تم حفظ الرد الجديد', 1, 'md') 
 DevAbs:del(ALQUBTAN.."Abs:Add:AllText"..msg.sender_user_id_)
@@ -1913,12 +1917,12 @@ local edit_msg = DevAbs:get(ALQUBTAN..'Abs:EditMsg'..msg.chat_id_..msg.sender_us
 local user_msgs = DevAbs:get(ALQUBTAN..'Abs:UsersMsgs'..msg.chat_id_..':'..msg.sender_user_id_)
 local Text = DevAbs:get(ALQUBTAN.."Abs:Text:AllRed"..msg.content_.text_)
 local Text = Text:gsub('#username',(username or 'لا يوجد')) 
-local Text = Text:gsub('#name','['..result.first_name_..']')
+local Text = Text:gsub('#name',result.first_name_)
 local Text = Text:gsub('#id',msg.sender_user_id_)
 local Text = Text:gsub('#edit',edit_msg)
 local Text = Text:gsub('#msgs',(user_msgs or 'لا يوجد'))
 local Text = Text:gsub('#stast',(IdRank(msg.sender_user_id_, msg.chat_id_) or 'لا يوجد'))
-Dev_Abs(msg.chat_id_, msg.id_, 1, Text, 'html')
+send(msg.chat_id_,msg.id_,'['..Text..']')
 end
 getUser(msg.sender_user_id_, ALQUBTANTEAM)
 end
