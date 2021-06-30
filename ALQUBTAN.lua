@@ -1782,7 +1782,12 @@ if msg.content_.animation_ then DevAbs:set(ALQUBTAN..'Abs:Gif:GpRed'..SaveGpRed.
 end 
 if msg.content_.text_ then
 Text = msg.content_.text_ 
-Text = Text:gsub('"',""):gsub('"',""):gsub("`",""):gsub("*",""):gsub("]",""):gsub("[","")
+Text = Text:gsub('"',"") 
+Text = Text:gsub("'","")
+Text = Text:gsub("`","")
+Text = Text:gsub("*","")
+Text = Text:gsub("]","")
+Text = Text:gsub("[","")
 DevAbs:set(ALQUBTAN..'Abs:Text:GpRed'..SaveGpRed..''..msg.chat_id_..'', Text)
 end 
 Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙تم حفظ الرد الجديد', 1, 'md') 
@@ -1881,7 +1886,12 @@ DevAbs:set(ALQUBTAN.."Abs:Gif:AllRed"..SaveAllRed, msg.content_.animation_.anima
 end
 if msg.content_.text_ then
 Text = msg.content_.text_ 
-Text = Text:gsub('"',""):gsub('"',""):gsub("`",""):gsub("*",""):gsub("]",""):gsub("[","")
+Text = Text:gsub('"',"") 
+Text = Text:gsub("'","")
+Text = Text:gsub("`","")
+Text = Text:gsub("*","")
+Text = Text:gsub("]","")
+Text = Text:gsub("[","")
 DevAbs:set(ALQUBTAN.."Abs:Text:AllRed"..SaveAllRed, Text)
 end 
 Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙تم حفظ الرد الجديد', 1, 'md') 
