@@ -4,39 +4,49 @@
 --                - ALQUBTAN -                --
 --         -- https://t.me/EKKKK2 --          --
 ------------------------------------------------ 
-redis = require('redis') 
-URL = require('socket.url') 
-HTTPS = require ("ssl.https") 
-https = require ("ssl.https") 
-http  = require ("socket.http") 
+LibsNumber = 0
+for v in io.popen('ls libs'):lines() do
+if v:match(".lua$") then
+LibsNumber = LibsNumber + 1
+end
+end
+if LibsNumber ~= 0 then
+URL     = dofile("./libs/url.lua")
+json    = dofile("./libs/JSON.lua")
+JSON    = dofile("./libs/dkjson.lua")
+serpent = dofile("./libs/serpent.lua")
+DevAbs  = dofile("./libs/redis.lua").connect("127.0.0.1", 6379)
+else 
+redis   = require('redis') 
+URL     = require('socket.url') 
 serpent = require("serpent") 
-json = dofile('./JSON.lua') 
-JSON = dofile('./dkjson.lua') 
-lgi = require('lgi') 
-notify = lgi.require('Notify') 
-utf8 = require ('lua-utf8') 
-notify.init ("Telegram updates") 
-DevAbs = redis.connect('127.0.0.1', 6379) 
-User = io.popen("whoami"):read('*a'):gsub('[\n\r]+', '')
-ServerALQUBTAN = io.popen("echo $SSH_CLIENT | awk '{ print $1}'"):read('*a') 
-Ip = io.popen("dig +short myip.opendns.com @resolver1.opendns.com"):read('*a'):gsub('[\n\r]+', '')
-Name = io.popen("uname -a | awk '{ name = $2 } END { print name }'"):read('*a'):gsub('[\n\r]+', '')
-Port = io.popen("echo ${SSH_CLIENT} | awk '{ port = $3 } END { print port }'"):read('*a'):gsub('[\n\r]+', '')
-UpTime = io.popen([[uptime | awk -F'( |,|:)+' '{if ($7=="min") m=$6; else {if ($7~/^day/) {d=$6;h=$8;m=$9} else {h=$6;m=$7}}} {print d+0,"days,",h+0,"hours,",m+0,"minutes"}']]):read('*a'):gsub('[\n\r]+', '')
+json    = dofile('./JSON.lua') 
+JSON    = dofile('./dkjson.lua') 
+DevAbs  = redis.connect('127.0.0.1', 6379)
+end
+HTTPS   = require ("ssl.https") 
+https   = require ("ssl.https") 
+http    = require ("socket.http") 
+User    = io.popen("whoami"):read('*a'):gsub('[\n\r]+', '')
+Server  = io.popen("echo $SSH_CLIENT | awk '{ print $1}'"):read('*a') 
+Ip      = io.popen("dig +short myip.opendns.com @resolver1.opendns.com"):read('*a'):gsub('[\n\r]+', '')
+Name    = io.popen("uname -a | awk '{ name = $2 } END { print name }'"):read('*a'):gsub('[\n\r]+', '')
+Port    = io.popen("echo ${SSH_CLIENT} | awk '{ port = $3 } END { print port }'"):read('*a'):gsub('[\n\r]+', '')
+UpTime  = io.popen([[uptime | awk -F'( |,|:)+' '{if ($7=="min") m=$6; else {if ($7~/^day/) {d=$6;h=$8;m=$9} else {h=$6;m=$7}}} {print d+0,"days,",h+0,"hours,",m+0,"minutes"}']]):read('*a'):gsub('[\n\r]+', '')
 --     Source ALQUBTAN     --
 local AutoSet = function() 
-if not DevAbs:get(ServerALQUBTAN.."IdALQUBTAN") then 
+if not DevAbs:get(Server.."IdALQUBTAN") then 
 io.write('\27[1;35m\nالان ارسل ايدي المطور الاساسي ↫ ⤈\n\27[0;33;49m') 
 local DevId = io.read():gsub(' ','') 
 if tostring(DevId):match('%d+') then 
 io.write('\27[1;36mتم حفظ ايدي المطور الاساسي\n27[0;39;49m') 
-DevAbs:set(ServerALQUBTAN.."IdALQUBTAN",DevId) 
+DevAbs:set(Server.."IdALQUBTAN",DevId) 
 else 
 print('\27[1;31m┉ ≈ ┉ ≈ ┉ ≈ ┉ ≈ ┉\nلم يتم حفظ ايدي المطور الاساسي ارسله مره اخرى\n┉ ≈ ┉ ≈ ┉ ≈ ┉ ≈ ┉') 
 end 
 os.execute('lua ALQUBTAN.lua') 
 end 
-if not DevAbs:get(ServerALQUBTAN.."TokenALQUBTAN") then 
+if not DevAbs:get(Server.."TokenALQUBTAN") then 
 io.write('\27[1;35m\nالان قم بارسال توكن البوت ↫ ⤈\n\27[0;33;49m') 
 local TokenBot = io.read() 
 if TokenBot ~= '' then 
@@ -45,13 +55,14 @@ if res ~= 200 then
 print('\27[1;31m┉ ≈ ┉ ≈ ┉ ≈ ┉ ≈ ┉\nالتوكن غير صحيح تاكد منه ثم ارسله\n┉ ≈ ┉ ≈ ┉ ≈ ┉ ≈ ┉') 
 else 
 io.write('\27[1;36mتم حفظ توكن البوت بنجاح\n27[0;39;49m') 
-DevAbs:set(ServerALQUBTAN.."TokenALQUBTAN",TokenBot) 
+DevAbs:set(Server.."TokenALQUBTAN",TokenBot) 
 end  
 else 
 print('\27[1;31m┉ ≈ ┉ ≈ ┉ ≈ ┉ ≈ ┉\nلم يتم حفظ توكن البوت ارسله مره اخرى\n┉ ≈ ┉ ≈ ┉ ≈ ┉ ≈ ┉') 
 end  
 os.execute('lua ALQUBTAN.lua') 
 end 
+DevAbs:set(DevAbs:get(Server.."TokenALQUBTAN"):match("(%d+)")..'Abs:Update',true)
 local Create = function(data, file, uglify)  
 file = io.open(file, "w+")   
 local serialized   
@@ -65,17 +76,17 @@ file:close()
 end
 local CreateConfigAuto = function()
 Config = {
-DevId = DevAbs:get(ServerALQUBTAN.."IdALQUBTAN"),
-TokenBot = DevAbs:get(ServerALQUBTAN.."TokenALQUBTAN"),
-ALQUBTAN = DevAbs:get(ServerALQUBTAN.."TokenALQUBTAN"):match("(%d+)"),
-SudoIds = {DevAbs:get(ServerALQUBTAN.."IdALQUBTAN")},
+DevId = DevAbs:get(Server.."IdALQUBTAN"),
+TokenBot = DevAbs:get(Server.."TokenALQUBTAN"),
+ALQUBTAN = DevAbs:get(Server.."TokenALQUBTAN"):match("(%d+)"),
+SudoIds = {DevAbs:get(Server.."IdALQUBTAN")},
 }
 Create(Config, "./config.lua")   
 file = io.open("ALQUBTAN.sh", "w")  
 file:write([[
 #!/usr/bin/env bash
 cd $HOME/ALQUBTAN
-token="]]..DevAbs:get(ServerALQUBTAN.."TokenALQUBTAN")..[["
+token="]]..DevAbs:get(Server.."TokenALQUBTAN")..[["
 while(true) do
 rm -fr ../.telegram-cli
 if [ ! -f ./tg ]; then
@@ -116,7 +127,7 @@ if not f then
 AutoSet() 
 else 
 f:close() 
-DevAbs:del(ServerALQUBTAN.."IdALQUBTAN");DevAbs:del(ServerALQUBTAN.."TokenALQUBTAN")
+DevAbs:del(Server.."IdALQUBTAN");DevAbs:del(Server.."TokenALQUBTAN")
 end 
 local config = loadfile("./config.lua")() 
 return config 
@@ -504,11 +515,6 @@ function ChatLeave(chat_id, user_id)
 changeChatMemberStatus(chat_id, user_id, "Left")
 end
 --     Source ALQUBTAN     --
-function do_notify(user, msg)
-local n = notify.Notification.new(user, msg)
-n:show ()
-end
---     Source ALQUBTAN     --
 function ChatKick(chat_id, user_id)
 changeChatMemberStatus(chat_id, user_id, "Kicked")
 end
@@ -597,12 +603,8 @@ vardump(data)
 end ,nil) 
 end
 --     Source ALQUBTAN     --
-function CatchName(Name,Num) 
-ChekName = utf8.sub(Name,0,Num) Name = ChekName return Name..'' 
-end
---     Source ALQUBTAN     --
-local AbsRank = function(msg) if SudoId(msg.sender_user_id_) then ALQUBTANTEAM  = "المطور" elseif SecondSudo(msg) then ALQUBTANTEAM = "المطور" elseif SudoBot(msg) then ALQUBTANTEAM = "المطور" elseif ManagerAll(msg) then ALQUBTANTEAM = "المدير" elseif AdminAll(msg) then ALQUBTANTEAM = "الادمن" elseif AbsConstructor(msg) then ALQUBTANTEAM = "المنشئ" elseif BasicConstructor(msg) then ALQUBTANTEAM = "المنشئ" elseif Constructor(msg) then ALQUBTANTEAM = "المنشئ" elseif Manager(msg) then ALQUBTANTEAM = "المدير" elseif Admin(msg) then ALQUBTANTEAM = "الادمن" else ALQUBTANTEAM = "العضو" end return ALQUBTANTEAM end
-function IdRank(user_id,chat_id) if tonumber(user_id) == tonumber(733713096) then ALQUBTANTEAM = 'مبرمج السورس' elseif tonumber(user_id) == tonumber(ALQUBTAN) then ALQUBTANTEAM = 'البوت' elseif SudoId(user_id) then ALQUBTANTEAM = 'المطور الاساسي' elseif DevAbs:sismember(ALQUBTAN..'Abs:SecondSudo:', user_id) then ALQUBTANTEAM = 'المطور الثانوي' elseif DevAbs:sismember(ALQUBTAN..'Abs:SudoBot:', user_id) then ALQUBTANTEAM = DevAbs:get(ALQUBTAN.."Abs:SudoBot:Rd"..chat_id) or 'المطور' elseif DevAbs:sismember(ALQUBTAN..'Abs:ManagerAll:', user_id) then ALQUBTANTEAM = DevAbs:get(ALQUBTAN.."Abs:Managers:Rd"..chat_id) or 'المدير العام' elseif DevAbs:sismember(ALQUBTAN..'Abs:AdminAll:', user_id) then ALQUBTANTEAM = DevAbs:get(ALQUBTAN.."Abs:Admins:Rd"..chat_id) or 'الادمن العام' elseif DevAbs:sismember(ALQUBTAN..'Abs:VipAll:', user_id) then ALQUBTANTEAM = DevAbs:get(ALQUBTAN.."Abs:VipMem:Rd"..chat_id) or 'المميز العام' elseif DevAbs:sismember(ALQUBTAN..'Abs:AbsConstructor:'..chat_id, user_id) then ALQUBTANTEAM = 'منشئ المجموعه' elseif DevAbs:sismember(ALQUBTAN..'Abs:BasicConstructor:'..chat_id, user_id) then ALQUBTANTEAM = DevAbs:get(ALQUBTAN.."Abs:BasicConstructor:Rd"..chat_id) or 'المنشئ الاساسي' elseif DevAbs:sismember(ALQUBTAN..'Abs:Constructor:'..chat_id, user_id) then ALQUBTANTEAM = DevAbs:get(ALQUBTAN.."Abs:Constructor:Rd"..chat_id) or 'المنشئ' elseif DevAbs:sismember(ALQUBTAN..'Abs:Managers:'..chat_id, user_id) then ALQUBTANTEAM = DevAbs:get(ALQUBTAN.."Abs:Managers:Rd"..chat_id) or 'المدير' elseif DevAbs:sismember(ALQUBTAN..'Abs:Admins:'..chat_id, user_id) then ALQUBTANTEAM = DevAbs:get(ALQUBTAN.."Abs:Admins:Rd"..chat_id) or 'الادمن' elseif DevAbs:sismember(ALQUBTAN..'Abs:VipMem:'..chat_id, user_id) then  ALQUBTANTEAM = DevAbs:get(ALQUBTAN.."Abs:VipMem:Rd"..chat_id) or 'المميز' elseif DevAbs:sismember(ALQUBTAN..'Abs:Cleaner:'..chat_id, user_id) then  ALQUBTANTEAM = DevAbs:get(ALQUBTAN.."Abs:Cleaner:Rd"..chat_id) or 'المنظف' else ALQUBTANTEAM = DevAbs:get(ALQUBTAN.."Abs:mem:Rd"..chat_id) or 'العضو' end return ALQUBTANTEAM end
+local AbsRank = function(msg) if SudoId(msg.sender_user_id_) then ALQUBTANTEAM  = "المطور" elseif SecondSudo(msg) then ALQUBTANTEAM = "المطور" elseif SudoBot(msg) then ALQUBTANTEAM = "المطور" elseif ManagerAll(msg) then ALQUBTANTEAM = "المدير" elseif AdminAll(msg) then ALQUBTANTEAM = "الادمن" elseif AbsConstructor(msg) then ALQUBTANTEAM = "المالك" elseif BasicConstructor(msg) then ALQUBTANTEAM = "المنشئ" elseif Constructor(msg) then ALQUBTANTEAM = "المنشئ" elseif Manager(msg) then ALQUBTANTEAM = "المدير" elseif Admin(msg) then ALQUBTANTEAM = "الادمن" else ALQUBTANTEAM = "العضو" end return ALQUBTANTEAM end
+function IdRank(user_id,chat_id) if tonumber(user_id) == tonumber(733713096) then ALQUBTANTEAM = 'مبرمج السورس' elseif tonumber(user_id) == tonumber(ALQUBTAN) then ALQUBTANTEAM = 'البوت' elseif SudoId(user_id) then ALQUBTANTEAM = 'المطور الاساسي' elseif DevAbs:sismember(ALQUBTAN..'Abs:SecondSudo:', user_id) then ALQUBTANTEAM = 'المطور الثانوي' elseif DevAbs:sismember(ALQUBTAN..'Abs:SudoBot:', user_id) then ALQUBTANTEAM = DevAbs:get(ALQUBTAN.."Abs:SudoBot:Rd"..chat_id) or 'المطور' elseif DevAbs:sismember(ALQUBTAN..'Abs:ManagerAll:', user_id) then ALQUBTANTEAM = DevAbs:get(ALQUBTAN.."Abs:Managers:Rd"..chat_id) or 'المدير العام' elseif DevAbs:sismember(ALQUBTAN..'Abs:AdminAll:', user_id) then ALQUBTANTEAM = DevAbs:get(ALQUBTAN.."Abs:Admins:Rd"..chat_id) or 'الادمن العام' elseif DevAbs:sismember(ALQUBTAN..'Abs:VipAll:', user_id) then ALQUBTANTEAM = DevAbs:get(ALQUBTAN.."Abs:VipMem:Rd"..chat_id) or 'المميز العام' elseif DevAbs:sismember(ALQUBTAN..'Abs:AbsConstructor:'..chat_id, user_id) then ALQUBTANTEAM = 'المالك' elseif DevAbs:sismember(ALQUBTAN..'Abs:BasicConstructor:'..chat_id, user_id) then ALQUBTANTEAM = DevAbs:get(ALQUBTAN.."Abs:BasicConstructor:Rd"..chat_id) or 'المنشئ الاساسي' elseif DevAbs:sismember(ALQUBTAN..'Abs:Constructor:'..chat_id, user_id) then ALQUBTANTEAM = DevAbs:get(ALQUBTAN.."Abs:Constructor:Rd"..chat_id) or 'المنشئ' elseif DevAbs:sismember(ALQUBTAN..'Abs:Managers:'..chat_id, user_id) then ALQUBTANTEAM = DevAbs:get(ALQUBTAN.."Abs:Managers:Rd"..chat_id) or 'المدير' elseif DevAbs:sismember(ALQUBTAN..'Abs:Admins:'..chat_id, user_id) then ALQUBTANTEAM = DevAbs:get(ALQUBTAN.."Abs:Admins:Rd"..chat_id) or 'الادمن' elseif DevAbs:sismember(ALQUBTAN..'Abs:VipMem:'..chat_id, user_id) then  ALQUBTANTEAM = DevAbs:get(ALQUBTAN.."Abs:VipMem:Rd"..chat_id) or 'المميز' elseif DevAbs:sismember(ALQUBTAN..'Abs:Cleaner:'..chat_id, user_id) then  ALQUBTANTEAM = DevAbs:get(ALQUBTAN.."Abs:Cleaner:Rd"..chat_id) or 'المنظف' else ALQUBTANTEAM = DevAbs:get(ALQUBTAN.."Abs:mem:Rd"..chat_id) or 'العضو' end return ALQUBTANTEAM end
 --     Source ALQUBTAN     --
 function RankChecking(user_id,chat_id)
 if SudoId(user_id) then
@@ -906,10 +908,10 @@ end
 if DataText == '/setyes' then
 local NewDev = DevAbs:get(ALQUBTAN.."Abs:NewDev"..data.sender_user_id_)
 tdcli_function ({ID = "GetUser",user_id_ = NewDev},function(arg,dp) 
-EditMsg(Chat_Id2, Msg_Id2, "⌁︙المطور الجديد ↫ ["..CatchName(dp.first_name_,15).."](tg://user?id="..dp.id_..")\n⌁︙تم تغير المطور الاساسي بنجاح") 
+EditMsg(Chat_Id2, Msg_Id2, "⌁︙المطور الجديد ↫ ["..dp.first_name_.."](tg://user?id="..dp.id_..")\n⌁︙تم تغير المطور الاساسي بنجاح") 
 end,nil)
 tdcli_function ({ID = "GetUser",user_id_ = data.sender_user_id_},function(arg,dp) 
-SendText(NewDev,"⌁︙بواسطة ↫ ["..CatchName(dp.first_name_,15).."](tg://user?id="..dp.id_..")\n⌁︙لقد اصبحت انت مطور هذا البوت",0,'md')
+SendText(NewDev,"⌁︙بواسطة ↫ ["..dp.first_name_.."](tg://user?id="..dp.id_..")\n⌁︙لقد اصبحت انت مطور هذا البوت",0,'md')
 end,nil)
 local Create = function(data, file, uglify)  
 file = io.open(file, "w+")   
@@ -965,11 +967,19 @@ keyboard = {}
 keyboard.inline_keyboard = {{{text="نعم",callback_data="/YesRolet"},{text="لا",callback_data="/NoRolet"}}} 
 return https.request("https://api.telegram.org/bot"..TokenBot..'/editMessageText?chat_id='..Chat_Id2..'&message_id='..Msg_Id2..'&text=' .. URL.escape(Text..Textt).."&parse_mode=markdown&disable_web_page_preview=true&reply_markup="..JSON.encode(keyboard))
 end
+if DataText == '/UnTkeed' then
+if DevAbs:sismember(ALQUBTAN..'Abs:Tkeed:'..Chat_Id2, data.sender_user_id_) then
+HTTPS.request("https://api.telegram.org/bot"..TokenBot.."/restrictChatMember?chat_id="..Chat_Id2.."&user_id="..data.sender_user_id_.."&can_send_messages=True&can_send_media_messages=True&can_send_other_messages=True&can_add_web_page_previews=True")
+DevAbs:srem(ALQUBTAN..'Abs:Tkeed:'..Chat_Id2, data.sender_user_id_)
+DeleteMessage(Chat_Id2,{[0] = MsgId2})
+return https.request("https://api.telegram.org/bot"..TokenBot..'/answercallbackquery?callback_query_id='..data.id_..'&text='..URL.escape("⌁ تم الغاء تقيدك من المجموعه بنجاح .")..'&show_alert=true')
+else
+return https.request("https://api.telegram.org/bot"..TokenBot..'/answercallbackquery?callback_query_id='..data.id_..'&text='..URL.escape("⌁ عذرا هذا الامر لكشف الروبوت وليس لك .")..'&show_alert=true')
+end 
+end
 end
 if (data.ID == "UpdateNewMessage") then
 local msg = data.message_
-local d = data.disable_notification_
-local chat = chats[msg.chat_id_]
 text = msg.content_.text_ 
 if text and DevAbs:get(ALQUBTAN.."Del:Cmd:Group"..msg.chat_id_..":"..msg.sender_user_id_) == "true" then
 local NewCmmd = DevAbs:get(ALQUBTAN.."Set:Cmd:Group:New1"..msg.chat_id_..":"..text)
@@ -1032,6 +1042,27 @@ DevAbs:del(ALQUBTAN.."Set:Cmd:Group:New1"..msg.chat_id_..":"..v)
 DevAbs:del(ALQUBTAN.."List:Cmd:Group:New"..msg.chat_id_)
 end
 Dev_Abs(msg.chat_id_, msg.id_, 1, "⌁︙تم حذف الاوامر المضافه في المجموعه", 1, 'html')
+end
+if text == "ترتيب الاوامر" then
+DevAbs:set(ALQUBTAN.."Set:Cmd:Group:New1"..msg.chat_id_..":ا","ايدي")
+DevAbs:sadd(ALQUBTAN.."List:Cmd:Group:New"..msg.chat_id_,"ا")
+DevAbs:set(ALQUBTAN.."Set:Cmd:Group:New1"..msg.chat_id_..":تك","تنزيل الكل")
+DevAbs:sadd(ALQUBTAN.."List:Cmd:Group:New"..msg.chat_id_,"تك")
+DevAbs:set(ALQUBTAN.."Set:Cmd:Group:New1"..msg.chat_id_..":م","رفع مميز")
+DevAbs:sadd(ALQUBTAN.."List:Cmd:Group:New"..msg.chat_id_,"م")
+DevAbs:set(ALQUBTAN.."Set:Cmd:Group:New1"..msg.chat_id_..":اد","رفع ادمن")
+DevAbs:sadd(ALQUBTAN.."List:Cmd:Group:New"..msg.chat_id_,"اد")
+DevAbs:set(ALQUBTAN.."Set:Cmd:Group:New1"..msg.chat_id_..":مد","رفع مدير")
+DevAbs:sadd(ALQUBTAN.."List:Cmd:Group:New"..msg.chat_id_,"مد")
+DevAbs:set(ALQUBTAN.."Set:Cmd:Group:New1"..msg.chat_id_..":من","رفع منشئ")
+DevAbs:sadd(ALQUBTAN.."List:Cmd:Group:New"..msg.chat_id_,"من")
+DevAbs:set(ALQUBTAN.."Set:Cmd:Group:New1"..msg.chat_id_..":اس","رفع منشئ اساسي")
+DevAbs:sadd(ALQUBTAN.."List:Cmd:Group:New"..msg.chat_id_,"اس")
+DevAbs:set(ALQUBTAN.."Set:Cmd:Group:New1"..msg.chat_id_..":تعط","تعطيل الايدي بالصوره")
+DevAbs:sadd(ALQUBTAN.."List:Cmd:Group:New"..msg.chat_id_,"تعط")
+DevAbs:set(ALQUBTAN.."Set:Cmd:Group:New1"..msg.chat_id_..":تفع","تفعيل الايدي بالصوره")
+DevAbs:sadd(ALQUBTAN.."List:Cmd:Group:New"..msg.chat_id_,"تفع")
+send(msg.chat_id_, msg.id_,"⌁︙تم ترتيب الاوامر بالشكل التالي ↫ ⤈\n┉ ≈ ┉ ≈ ┉ ≈ ┉ ≈ ┉\n⌁︙ايدي ↫ ا\n⌁︙تنزيل الكل ↫ تك\n⌁︙رفع مميز ↫ م\n⌁︙رفع ادمن ↫ اد \n⌁︙رفع مدير ↫ مد \n⌁︙رفع منشئ ↫ من \n⌁︙رفع منشئ اساسي ↫ اس  \n⌁︙تعطيل الايدي بالصوره ↫ تعط\n⌁︙تفعيل الايدي بالصوره ↫ تفع\n┉ ≈ ┉ ≈ ┉ ≈ ┉ ≈ ┉")  
 end
 if text == "اضف امر" or text == "اضافة امر" or text == "اضافه امر" and ChCheck(msg) then
 DevAbs:set(ALQUBTAN.."Set:Cmd:Group"..msg.chat_id_..":"..msg.sender_user_id_,"true") 
@@ -1606,11 +1637,6 @@ Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙لا تستطيع تفعيل هذه ا�
 end 
 end 
 --     Source ALQUBTAN     --
-if msg.date_ and msg.date_ < tonumber(os.time() - 30) then
-print("*( OLD MESSAGE )*")
-return false
-end
---     Source ALQUBTAN     --
 tdcli_function({ID = "GetUser",user_id_ = msg.sender_user_id_},function(arg,data) 
 if data.username_ ~= false then
 DevAbs:set(ALQUBTAN..'Save:UserName'..msg.sender_user_id_,data.username_)
@@ -1618,12 +1644,24 @@ end;end,nil)
 --     Source ALQUBTAN     --
 local ReFalse = tostring(msg.chat_id_)
 if not DevAbs:sismember(ALQUBTAN.."Abs:Groups",msg.chat_id_) and not ReFalse:match("^(%d+)") and not SudoBot(msg) then
-print("Return False [ Not Enable ]")
+print("Return False : The Bot Is Not Enabled In The Group")
 return false
 end
 --     Source ALQUBTAN     --
 -------- MSG TYPES ---------
 if msg.content_.ID == "MessageChatJoinByLink" and not VipMem(msg) then 
+if DevAbs:get(ALQUBTAN..'Abs:Lock:Robot'..msg.chat_id_) then
+tdcli_function({ID="GetUser",user_id_=msg.sender_user_id_},function(arg,dp) 
+HTTPS.request("https://api.telegram.org/bot"..TokenBot.."/restrictChatMember?chat_id="..msg.chat_id_.."&user_id="..dp.id_)
+DevAbs:sadd(ALQUBTAN..'Abs:Tkeed:'..msg.chat_id_, dp.id_)
+local Text = '⌁︙اهلا عزيزي ↫ ['..string.sub(dp.first_name_,0, 40)..'](tg://user?id='..dp.id_..')\n⌁︙يجب علينا التأكد أنك لست روبوت\n⌁︙تم تقيدك اضغط الزر بالاسفل لفكه'
+keyboard = {} 
+keyboard.inline_keyboard = {{{text="اضغط هنا لفك تقيدك",callback_data="/UnTkeed"}}} 
+Msg_id = msg.id_/2097152/0.5
+HTTPS.request("https://api.telegram.org/bot"..TokenBot..'/sendMessage?chat_id='..msg.chat_id_..'&text='..URL.escape(Text).."&reply_to_message_id="..Msg_id.."&parse_mode=markdown&disable_web_page_preview=true&reply_markup="..JSON.encode(keyboard))
+end,nil)
+return false
+end
 if DevAbs:get(ALQUBTAN.."Abs:Lock:Join"..msg.chat_id_) then
 ChatKick(msg.chat_id_,msg.sender_user_id_) 
 return false  
@@ -1663,14 +1701,6 @@ DeleteMessage(msg.chat_id_,{[0] = msg.id_})
 return false   
 end
 end
-end
-end
---     Source ALQUBTAN     --
-if ((not d) and chat) then
-if msg.content_.ID == "MessageText" then
-do_notify (chat.title_, msg.content_.text_)
-else
-do_notify (chat.title_, msg.content_.ID)
 end
 end
 --     Source ALQUBTAN     --
@@ -1897,7 +1927,7 @@ end
 --       Spam Send        --
 function NotSpam(msg,Type)
 tdcli_function ({ID = "GetUser",user_id_ = msg.sender_user_id_},function(arg,dp) 
-local GetName = '['..CatchName(dp.first_name_,15)..'](tg://user?id='..dp.id_..')'
+local GetName = '['..dp.first_name_..'](tg://user?id='..dp.id_..')'
 if Type == "kick" then 
 ChatKick(msg.chat_id_,msg.sender_user_id_) 
 my_ide = msg.sender_user_id_
@@ -2146,14 +2176,14 @@ return
 end
 function get_welcome(extra,result,success)
 if DevAbs:get(ALQUBTAN..'Abs:Groups:Welcomes'..msg.chat_id_) then
-text = DevAbs:get(ALQUBTAN..'Abs:Groups:Welcomes'..msg.chat_id_)
+Welcomes = DevAbs:get(ALQUBTAN..'Abs:Groups:Welcomes'..msg.chat_id_)
 else
-text = '• نورت حبي \n• [firstname lastname] \n• [@username]'
+Welcomes = '• نورت حبي \n• firstname \n• @username'
 end
-local text = text:gsub('firstname',(result.first_name_ or ''))
-local text = text:gsub('lastname',(result.last_name_ or ''))
-local text = text:gsub('username',(result.username_ or 'EKKKK2'))
-Dev_Abs(msg.chat_id_, msg.id_, 1, text, 1, 'md')
+local Welcomes = Welcomes:gsub('"',"") Welcomes = Welcomes:gsub("'","") Welcomes = Welcomes:gsub(",","") Welcomes = Welcomes:gsub("*","") Welcomes = Welcomes:gsub(";","") Welcomes = Welcomes:gsub("`","") Welcomes = Welcomes:gsub("{","") Welcomes = Welcomes:gsub("}","") 
+local Welcomes = Welcomes:gsub('firstname',('['..result.first_name_..']' or ''))
+local Welcomes = Welcomes:gsub('username',('[@'..result.username_..']' or '[@EKKKK2]'))
+Dev_Abs(msg.chat_id_, msg.id_, 1, Welcomes, 1, 'md')
 end 
 if DevAbs:get(ALQUBTAN.."Abs:Lock:Welcome"..msg.chat_id_) then
 getUser(msg.sender_user_id_,get_welcome)
@@ -2198,14 +2228,14 @@ return false
 end
 if DevAbs:get(ALQUBTAN.."Abs:Lock:Welcome"..msg.chat_id_) then
 if DevAbs:get(ALQUBTAN..'Abs:Groups:Welcomes'..msg.chat_id_) then
-text = DevAbs:get(ALQUBTAN..'Abs:Groups:Welcomes'..msg.chat_id_)
+Welcomes = DevAbs:get(ALQUBTAN..'Abs:Groups:Welcomes'..msg.chat_id_)
 else
-text = '• نورت حبي \n• [firstname lastname] \n• [@username]'
+Welcomes = '• نورت حبي \n• firstname \n• @username'
 end
-local text = text:gsub('firstname',(msg.content_.members_[0].first_name_ or ''))
-local text = text:gsub('lastname',(msg.content_.members_[0].last_name_ or ''))
-local text = text:gsub('username',(msg.content_.members_[0].username_ or 'EKKKK2'))
-Dev_Abs(msg.chat_id_, msg.id_, 1, text, 1, 'md')
+local Welcomes = Welcomes:gsub('"',"") Welcomes = Welcomes:gsub("'","") Welcomes = Welcomes:gsub(",","") Welcomes = Welcomes:gsub("*","") Welcomes = Welcomes:gsub(";","") Welcomes = Welcomes:gsub("`","") Welcomes = Welcomes:gsub("{","") Welcomes = Welcomes:gsub("}","") 
+local Welcomes = Welcomes:gsub('firstname',('['..msg.content_.members_[0].first_name_..']' or ''))
+local Welcomes = Welcomes:gsub('username',('[@'..msg.content_.members_[0].username_..']' or '[@EKKKK2]'))
+Dev_Abs(msg.chat_id_, msg.id_, 1, Welcomes, 1, 'md')
 end
 --     Source ALQUBTAN     --
 --        Contact         --
@@ -2604,6 +2634,7 @@ local GetJson = '{"BotId": '..ALQUBTAN..',"BotName": "'..BotName..'","GroupsList
 for k,v in pairs(List) do 
 LinkGroups = DevAbs:get(ALQUBTAN.."Abs:Groups:Links"..v)
 Welcomes = DevAbs:get(ALQUBTAN..'Abs:Groups:Welcomes'..v) or ''
+Welcomes = Welcomes:gsub('"',"") Welcomes = Welcomes:gsub("'","") Welcomes = Welcomes:gsub(",","") Welcomes = Welcomes:gsub("*","") Welcomes = Welcomes:gsub(";","") Welcomes = Welcomes:gsub("`","") Welcomes = Welcomes:gsub("{","") Welcomes = Welcomes:gsub("}","") 
 AbsConstructors = DevAbs:smembers(ALQUBTAN..'Abs:AbsConstructor:'..v)
 Constructors = DevAbs:smembers(ALQUBTAN..'Abs:BasicConstructor:'..v)
 BasicConstructors = DevAbs:smembers(ALQUBTAN..'Abs:Constructor:'..v)
@@ -3457,7 +3488,12 @@ end
 --     Source ALQUBTAN     --
 if text == 'كت تويت' and ChCheck(msg) then
 if not DevAbs:get(ALQUBTAN..'Abs:Lock:Games'..msg.chat_id_) then
-local ALQUBTANTEAM = {  "آخر مرة زرت مدينة الملاهي؟",  "آخر مرة أكلت أكلتك المفضّلة؟",  "الوضع الحالي؟\n‏1. سهران\n‏2. ضايج\n‏3. أتأمل",  "آخر شيء ضاع منك؟","كلمة أخيرة لشاغل البال؟","طريقتك المعتادة في التخلّص من الطاقة السلبية؟","شهر من أشهر العام له ذكرى جميلة معك؟","كلمة غريبة من لهجتك ومعناها؟🤓","‏- شيء سمعته عالق في ذهنك هاليومين؟","متى تكره الشخص الذي أمامك حتى لو كنت مِن أشد معجبينه؟","‏- أبرز صفة حسنة في صديقك المقرب؟","هل تشعر أن هنالك مَن يُحبك؟","اذا اكتشفت أن أعز أصدقائك يضمر لك السوء، موقفك الصريح؟","أجمل شيء حصل معك خلال هاليوم؟","صِف شعورك وأنت تُحب شخص يُحب غيرك؟👀💔","كلمة لشخص غالي اشتقت إليه؟💕","آخر خبر سعيد، متى وصلك؟","أنا آسف على ....؟","أوصف نفسك بكلمة؟","صريح، مشتاق؟","‏- صريح، هل سبق وخذلت أحدهم ولو عن غير قصد؟","‏- ماذا ستختار من الكلمات لتعبر لنا عن حياتك التي عشتها الى الآن؟💭","‏- فنان/ة تود لو يدعوكَ على مائدة عشاء؟😁❤","‏- تخيّل شيء قد يحدث في المستقبل؟","‏- للشباب | آخر مرة وصلك غزل من فتاة؟🌚","شخص أو صاحب عوضك ونساك مُر الحياة ما اسمه ؟","| اذا شفت حد واعجبك وعندك الجرأه انك تروح وتتعرف عليه ، مقدمة الحديث شو راح تكون ؟.", }  
+local ALQUBTANTEAM = {
+'آخر مرة زرت مدينة الملاهي؟','آخر مرة أكلت أكلتك المفضّلة؟','الوضع الحالي؟\n‏1. سهران\n‏2. ضايج\n‏3. أتأمل','آخر شيء ضاع منك؟','كلمة أخيرة لشاغل البال؟','طريقتك المعتادة في التخلّص من الطاقة السلبية؟','شهر من أشهر العام له ذكرى جميلة معك؟','كلمة غريبة من لهجتك ومعناها؟🤓','‏- شيء سمعته عالق في ذهنك هاليومين؟','متى تكره الشخص الذي أمامك حتى لو كنت مِن أشد معجبينه؟','‏- أبرز صفة حسنة في صديقك المقرب؟','هل تشعر أن هنالك مَن يُحبك؟','اذا اكتشفت أن أعز أصدقائك يضمر لك السوء، موقفك الصريح؟','أجمل شيء حصل معك خلال هاليوم؟','صِف شعورك وأنت تُحب شخص يُحب غيرك؟👀💔','كلمة لشخص غالي اشتقت إليه؟💕','آخر خبر سعيد، متى وصلك؟','أنا آسف على ....؟','أوصف نفسك بكلمة؟','صريح، مشتاق؟','‏- صريح، هل سبق وخذلت أحدهم ولو عن غير قصد؟','‏- ماذا ستختار من الكلمات لتعبر لنا عن حياتك التي عشتها الى الآن؟💭','‏- فنان/ة تود لو يدعوكَ على مائدة عشاء؟😁❤','‏- تخيّل شيء قد يحدث في المستقبل؟','‏- للشباب | آخر مرة وصلك غزل من فتاة؟🌚','شخص أو صاحب عوضك ونساك مُر الحياة ما اسمه ؟','| اذا شفت حد واعجبك وعندك الجرأه انك تروح وتتعرف عليه ، مقدمة الحديث شو راح تكون ؟.','كم مره تسبح باليوم','نسبة النعاس عندك حاليًا؟','لو فقط مسموح شخص واحد تتابعه فالسناب مين بيكون ؟','يهمك ملابسك تكون ماركة ؟','وش الشيء الي تطلع حرتك فيه و زعلت ؟','عندك أخوان او خوات من الرضاعة؟','عندك معجبين ولا محد درا عنك؟',
+'أطول مدة قضيتها بعيد عن أهلك ؟','لو يجي عيد ميلادك تتوقع يجيك هدية؟','يبان عليك الحزن من " صوتك - ملامحك','وين تشوف نفسك بعد سنتين؟','وش يقولون لك لما تغني ؟','عندك حس فكاهي ولا نفسية؟','كيف تتصرف مع الشخص الفضولي ؟','كيف هي أحوال قلبك؟','حاجة تشوف نفسك مبدع فيها ؟','متى حبيت؟','شيء كل م تذكرته تبتسم ...','العلاقه السريه دايماً تكون حلوه؟','صوت مغني م تحبه','لو يجي عيد ميلادك تتوقع يجيك هدية؟','اذا احد سألك عن شيء م تعرفه تقول م اعرف ولا تتفلسف ؟','مع او ضد : النوم افضل حل لـ مشاكل الحياة؟','مساحة فارغة (..............) اكتب اي شيء تبين','اغرب اسم مر عليك ؟','عمرك كلمت فويس احد غير جنسك؟','اذا غلطت وعرفت انك غلطان تحب تعترف ولا تجحد؟','لو عندك فلوس وش السيارة اللي بتشتريها؟','وش اغبى شيء سويته ؟','شيء من صغرك ماتغير فيك؟','وش نوع الأفلام اللي تحب تتابعه؟','وش نوع الأفلام اللي تحب تتابعه؟','تجامل احد على حساب مصلحتك ؟','تتقبل النصيحة من اي شخص؟','كلمه ماسكه معك الفترة هذي ؟','متى لازم تقول لا ؟','اكثر شيء تحس انه مات ف مجتمعنا؟','تؤمن ان في "حُب من أول نظرة" ولا لا ؟.','تؤمن ان في "حُب من أول نظرة" ولا لا ؟.','هل تعتقد أن هنالك من يراقبك بشغف؟','اشياء اذا سويتها لشخص تدل على انك تحبه كثير ؟','اشياء صعب تتقبلها بسرعه ؟','اقتباس لطيف؟','أكثر جملة أثرت بك في حياتك؟','عندك فوبيا من شيء ؟.',
+'اكثر لونين تحبهم مع بعض؟','أجمل بيت شعر سمعته ...','سبق وراودك شعور أنك لم تعد تعرف نفسك؟','تتوقع فيه احد حاقد عليك ويكرهك ؟','أجمل سنة ميلادية مرت عليك ؟','لو فزعت/ي لصديق/ه وقالك مالك دخل وش بتسوي/ين؟','وش تحس انك تحتاج الفترة هاذي ؟','يومك ضاع على؟','@منشن .. شخص تخاف منه اذا عصب ...','فيلم عالق في ذهنك لا تنساه مِن روعته؟','تختار أن تكون غبي أو قبيح؟','الفلوس او الحب ؟','أجمل بلد في قارة آسيا بنظرك؟','ما الذي يشغل بالك في الفترة الحالية؟','احقر الناس هو من ...','وين نلقى السعاده برايك؟','اشياء تفتخر انك م سويتها ؟','تزعلك الدنيا ويرضيك ؟','وش الحب بنظرك؟','افضل هديه ممكن تناسبك؟','كم في حسابك البنكي ؟','كلمة لشخص أسعدك رغم حزنك في يومٍ من الأيام ؟','عمرك انتقمت من أحد ؟!','ما السيء في هذه الحياة ؟','غنية عندك معاها ذكريات🎵🎻','/','أفضل صفة تحبه بنفسك؟','اكثر وقت تحب تنام فيه ...','أطول مدة نمت فيها كم ساعة؟','أصعب قرار ممكن تتخذه ؟','أفضل صفة تحبه بنفسك؟','اكثر وقت تحب تنام فيه ...','أنت محبوب بين الناس؟ ولاكريه؟','إحساسك في هاللحظة؟','اخر شيء اكلته ؟','تشوف الغيره انانيه او حب؟','اذكر موقف ماتنساه بعمرك؟','اكثر مشاكلك بسبب ؟','اول ماتصحى من النوم مين تكلمه؟','آخر مرة ضحكت من كل قلبك؟','لو الجنسية حسب ملامحك وش بتكون جنسيتك؟','اكثر شيء يرفع ضغطك','اذكر موقف ماتنساه بعمرك؟','لو قالوا لك  تناول صنف واحد فقط من الطعام لمدة شهر .',
+'كيف تشوف الجيل ذا؟','ردة فعلك لو مزح معك شخص م تعرفه ؟','احقر الناس هو من ...','تحب ابوك ولا امك','آخر فيلم مسلسل والتقييم🎥؟','أقبح القبحين في العلاقة: الغدر أو الإهمال🤷🏼؟','كلمة لأقرب شخص لقلبك🤍؟','حط@منشن لشخص وقوله "حركتك مالها داعي"😼!','اذا جاك خبر مفرح اول واحد تعلمه فيه مين💃🏽؟','طبع يمكن يخليك تكره شخص حتى لو كنت تُحبه🙅🏻‍♀️؟','افضل ايام الاسبوع عندك🔖؟','يقولون ان الحياة دروس ، ماهو أقوى درس تعلمته من الحياة🏙؟','تاريخ لن تنساه📅؟','تحب الصيف والا الشتاء❄️☀️؟','شخص تحب تستفزه😈؟','شنو ينادونك وانت صغير (عيارتك)👼🏻؟','عقل يفهمك/ج ولا قلب يحبك/ج❤️؟','اول سفره لك وين رح تكون✈️؟','كم عدد اللي معطيهم بلوك👹؟','نوعية من الأشخاص تتجنبهم في حياتك❌؟','شاركنا صورة او فيديو من تصويرك؟📸','كم من عشره تعطي حظك📩؟','اكثر برنامج تواصل اجتماعي تحبه😎؟','من اي دوله انت🌍؟','اكثر دوله ودك تسافر لها🏞؟','مقولة "نكبر وننسى" هل تؤمن بصحتها🧓🏼؟','تعتقد فيه أحد يراقبك👩🏼‍💻؟','لو بيدك تغير الزمن ، تقدمه ولا ترجعه🕰؟','مشروبك المفضل🍹؟','‏قم بلصق آخر اقتباس نسخته؟💭','كم وزنك/ج طولك/ج؟🌚','كم كان عمرك/ج قبل ٨ سنين😈؟','دوله ندمت انك سافرت لها😁؟','لو قالو لك ٣ أمنيات راح تتحقق عالسريع شنو تكون🧞‍♀️؟','‏- نسبة احتياجك للعزلة من 10📊؟','شخص تحبه حظرك بدون سبب واضح، ردة فعلك🧐؟','مبدأ في الحياة تعتمد عليه دائما🕯؟'
+}  
 Dev_Abs(msg.chat_id_, msg.id_, 1, ''..ALQUBTANTEAM[math.random(#ALQUBTANTEAM)]..'' , 1, 'md')  
 return false
 end
@@ -3527,9 +3563,9 @@ DevAbs:sadd(ALQUBTAN..'Abs:AbsConstructor:'..msg.chat_id_,Manager_id)
 end  
 end  
 if num == 0 then
-Dev_Abs(msg.chat_id_, msg.id_, 1, "⌁︙لا يوجد ادمنيه ليتم رفعهم\n⌁︙تم رفع منشئ المجموعه", 1, 'md')
+Dev_Abs(msg.chat_id_, msg.id_, 1, "⌁︙لا يوجد ادمنيه ليتم رفعهم\n⌁︙تم رفع مالك المجموعه", 1, 'md')
 else
-Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙تم رفع '..num..' من الادمنيه \n⌁︙تم رفع منشئ المجموعه', 1, 'md')
+Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙تم رفع '..num..' من الادمنيه \n⌁︙تم رفع مالك المجموعه', 1, 'md')
 end
 end,nil) 
 end
@@ -3572,7 +3608,7 @@ end
 end
 --     Source ALQUBTAN     --
 if text == "تعيين قناة الاشتراك" or text == "تغيير قناة الاشتراك" or text == "تعيين الاشتراك الاجباري" or text == "وضع قناة الاشتراك" then
-if not SecondSudo(msg) then
+if not Sudo(msg) then
 Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙للمطور الاساسي فقط ', 1, 'md')
 else
 DevAbs:setex(ALQUBTAN..'DevAbs4'..msg.sender_user_id_,360,true)
@@ -3581,7 +3617,7 @@ end
 return false  
 end
 if text == "تفعيل الاشتراك الاجباري" then  
-if not SecondSudo(msg) then
+if not Sudo(msg) then
 Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙للمطور الاساسي فقط ', 1, 'md')
 else
 if DevAbs:get(ALQUBTAN..'DevAbs2') then
@@ -3595,7 +3631,7 @@ end
 return false  
 end
 if text == "تعطيل الاشتراك الاجباري" then  
-if not SecondSudo(msg) then
+if not Sudo(msg) then
 Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙للمطور الاساسي فقط ', 1, 'md')
 else
 DevAbs:del(ALQUBTAN..'DevAbs2') DevAbs:del(ALQUBTAN..'DevAbs3')
@@ -3605,7 +3641,7 @@ end
 return false  
 end
 if text == "حذف قناة الاشتراك" or text == "حذف قناه الاشتراك" then
-if not SecondSudo(msg) then
+if not Sudo(msg) then
 Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙للمطور الاساسي فقط ', 1, 'md')
 else
 DevAbs:del(ALQUBTAN..'DevAbs2') DevAbs:del(ALQUBTAN..'DevAbs3')
@@ -4404,8 +4440,91 @@ DevAbs:srem(ALQUBTAN..'Abs:VipAll:',user)
 ReplyStatus(msg,user,"Reply","⌁︙تم تنزيله من قائمة المميزين العام")  
 end end
 --     Source ALQUBTAN     --
---  Set BasicConstructor  --
+--   Set AbsConstructor   --
 if ChatType == 'sp' or ChatType == 'gp'  then
+if SudoBot(msg) then
+if text ==('رفع مالك') and ChCheck(msg) then
+function raf_reply(extra, result, success)
+DevAbs:sadd(ALQUBTAN..'Abs:AbsConstructor:'..msg.chat_id_,result.sender_user_id_)
+ReplyStatus(msg,result.sender_user_id_,"Reply","⌁︙تم رفعه مالك")  
+end 
+if tonumber(tonumber(msg.reply_to_message_id_)) == 0 then
+else
+getMessage(msg.chat_id_, tonumber(msg.reply_to_message_id_),raf_reply)
+end end
+if text and text:match('^رفع مالك @(.*)') and ChCheck(msg) then
+local username = text:match('^رفع مالك @(.*)')
+function promreply(extra,result,success)
+if result.id_ then
+DevAbs:sadd(ALQUBTAN..'Abs:AbsConstructor:'..msg.chat_id_,result.id_)
+ReplyStatus(msg,result.id_,"Reply","⌁︙تم رفعه مالك")  
+else 
+Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙*المعرف غير صحيح*', 1, 'md')
+end end 
+resolve_username(username,promreply)
+end
+if text and text:match('^رفع مالك (%d+)') and ChCheck(msg) then
+local user = text:match('رفع مالك (%d+)')
+DevAbs:sadd(ALQUBTAN..'Abs:AbsConstructor:'..msg.chat_id_,user)
+ReplyStatus(msg,user,"Reply","⌁︙تم رفعه مالك")  
+end
+--     Source ALQUBTAN     --
+--   Rem AbsConstructor   --
+if text ==('تنزيل مالك') and ChCheck(msg) then
+function prom_reply(extra, result, success)
+tdcli_function ({ID = "GetChannelMembers",channel_id_ = msg.chat_id_:gsub("-100",""),filter_ = {ID = "ChannelMembersAdministrators"},offset_ = 0,limit_ = 100},function(arg,data) 
+local admins = data.members_
+for i=0 , #admins do
+if data.members_[i].status_.ID == "ChatMemberStatusCreator" then
+if tonumber(result.sender_user_id_) == tonumber(admins[i].user_id_) then  
+Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙لا يمكن تنزيل المالك الاساسي', 1, 'md')
+else
+DevAbs:srem(ALQUBTAN..'Abs:AbsConstructor:'..msg.chat_id_,result.sender_user_id_)
+ReplyStatus(msg,result.sender_user_id_,"Reply","⌁︙تم تنزيله من المالكين")  
+end end end
+end,nil)
+end 
+if tonumber(tonumber(msg.reply_to_message_id_)) == 0 then
+else
+getMessage(msg.chat_id_, tonumber(msg.reply_to_message_id_),prom_reply)
+end 
+end
+if text and text:match('^تنزيل مالك @(.*)') and ChCheck(msg) then
+local username = text:match('^تنزيل مالك @(.*)')
+function promreply(extra,result,success)
+if result.id_ then
+tdcli_function ({ID = "GetChannelMembers",channel_id_ = msg.chat_id_:gsub("-100",""),filter_ = {ID = "ChannelMembersAdministrators"},offset_ = 0,limit_ = 100},function(arg,data) 
+local admins = data.members_
+for i=0 , #admins do
+if data.members_[i].status_.ID == "ChatMemberStatusCreator" then
+if tonumber(result.id_) == tonumber(admins[i].user_id_) then  
+Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙لا يمكن تنزيل المالك الاساسي', 1, 'md')
+else
+DevAbs:srem(ALQUBTAN..'Abs:AbsConstructor:'..msg.chat_id_,result.id_)
+ReplyStatus(msg,result.id_,"Reply","⌁︙تم تنزيله من المالكين")  
+end end end
+end,nil)
+else 
+Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙*المعرف غير صحيح*', 1, 'md')
+end end 
+resolve_username(username,promreply)
+end
+if text and text:match('^تنزيل مالك (%d+)') and ChCheck(msg) then
+local user = text:match('تنزيل مالك (%d+)')
+tdcli_function ({ID = "GetChannelMembers",channel_id_ = msg.chat_id_:gsub("-100",""),filter_ = {ID = "ChannelMembersAdministrators"},offset_ = 0,limit_ = 100},function(arg,data) 
+local admins = data.members_
+for i=0 , #admins do
+if data.members_[i].status_.ID == "ChatMemberStatusCreator" then
+if tonumber(user) == tonumber(admins[i].user_id_) then  
+Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙لا يمكن تنزيل المالك الاساسي', 1, 'md')
+else
+DevAbs:srem(ALQUBTAN..'Abs:AbsConstructor:'..msg.chat_id_,user)
+ReplyStatus(msg,user,"Reply","⌁︙تم تنزيله من المالكين")  
+end end end
+end,nil)
+end end
+--     Source ALQUBTAN     --
+--  Set BasicConstructor  --
 if AbsConstructor(msg) then
 if text ==('رفع منشئ اساسي') and ChCheck(msg) then
 function raf_reply(extra, result, success)
@@ -4460,7 +4579,7 @@ DevAbs:srem(ALQUBTAN..'Abs:BasicConstructor:'..msg.chat_id_,user)
 ReplyStatus(msg,user,"Reply","⌁︙تم تنزيله منشئ اساسي")  
 end end
 if text ==('رفع منشئ اساسي') and not AbsConstructor(msg) then
-Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙هذا الامر لمنشئ المجموعه والمطورين فقط', 1, 'md')
+Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙هذا الامر للمالكين والمطورين فقط', 1, 'md')
 end
 --     Source ALQUBTAN     --
 --    Set  Constructor    --
@@ -5334,7 +5453,7 @@ if tonumber(user) == tonumber(ALQUBTAN) then
 Dev_Abs(msg.chat_id_, msg.id_, 1, "⌁︙*لاتستطيع حظر البوت عام*", 1, 'md')
 return false 
 end
-if SudoId(user) == true then
+if SudoId(tonumber(user)) == true then
 Dev_Abs(msg.chat_id_, msg.id_, 1, "⌁︙*لاتستطيع حظر المطور الاساسي*", 1, 'md')
 return false 
 end
@@ -5398,7 +5517,7 @@ if tonumber(user) == tonumber(ALQUBTAN) then
 Dev_Abs(msg.chat_id_, msg.id_, 1, "⌁︙*لاتستطيع كتم البوت عام*", 1, 'md')
 return false 
 end
-if SudoId(user) == true then
+if SudoId(tonumber(user)) == true then
 Dev_Abs(msg.chat_id_, msg.id_, 1, "⌁︙*لاتستطيع كتم المطور الاساسي*", 1, 'md')
 return false 
 end
@@ -5458,7 +5577,7 @@ if dp.first_name_ ~= false then
 DevAbs:del(ALQUBTAN.."Abs:EditDev"..msg.sender_user_id_)
 DevAbs:set(ALQUBTAN.."Abs:NewDev"..msg.sender_user_id_,dp.id_)
 if dp.username_ ~= false then DevUser = '\n⌁︙المعرف ↫ [@'..dp.username_..']' else DevUser = '' end
-local Text = '⌁︙الايدي ↫ '..dp.id_..DevUser..'\n⌁︙الاسم ↫ ['..CatchName(dp.first_name_,15)..'](tg://user?id='..dp.id_..')\n⌁︙تم حفظ المعلومات بنجاح\n⌁︙استخدم الازرار للتاكيد ↫ ⤈'
+local Text = '⌁︙الايدي ↫ '..dp.id_..DevUser..'\n⌁︙الاسم ↫ ['..dp.first_name_..'](tg://user?id='..dp.id_..')\n⌁︙تم حفظ المعلومات بنجاح\n⌁︙استخدم الازرار للتاكيد ↫ ⤈'
 keyboard = {} 
 keyboard.inline_keyboard = {{{text="نعم",callback_data="/setyes"},{text="لا",callback_data="/setno"}}} 
 Msg_id = msg.id_/2097152/0.5
@@ -5696,6 +5815,21 @@ Dev_Abs(msg.chat_id_, msg.id_, 1, text, 1, "md")
 end end 
 --     Source ALQUBTAN     --
 if AbsConstructor(msg) then
+if text == "المالكين" and ChCheck(msg) then 
+local List = DevAbs:smembers(ALQUBTAN..'Abs:AbsConstructor:'..msg.chat_id_)
+text = "⌁︙قائمة المالكين ↫ ⤈ \n┉ ≈ ┉ ≈ ┉ ≈ ┉ ≈ ┉\n"
+for k,v in pairs(List) do
+local username = DevAbs:get(ALQUBTAN..'Save:UserName'..v)
+if username then
+text = text..""..k.."~ : [@"..username.."]\n"
+else
+text = text..""..k.."~ : `"..v.."`\n"
+end end
+if #List == 0 then 
+text = "⌁︙*لا يوجد مالكين*"
+end
+Dev_Abs(msg.chat_id_, msg.id_, 1, text, 1, "md")
+end 
 if text == "المنشئين الاساسيين" and ChCheck(msg) or text == "منشئين اساسيين" and ChCheck(msg) or text == "المنشئين الاساسين" and ChCheck(msg) then 
 local List = DevAbs:smembers(ALQUBTAN..'Abs:BasicConstructor:'..msg.chat_id_)
 text = "⌁︙قائمة المنشئين الاساسيين ↫ ⤈ \n┉ ≈ ┉ ≈ ┉ ≈ ┉ ≈ ┉\n"
@@ -5724,7 +5858,7 @@ Dev_Abs(msg.chat_id_, msg.id_, 1, "⌁︙حساب المنشئ محذوف", 1, "
 return false  
 end
 local UserName = (dp.username_ or "EKKKK2")
-Dev_Abs(msg.chat_id_, msg.id_, 1, "⌁︙منشئ المجموعه ↫ ["..dp.first_name_.."](T.me/"..UserName..")", 1, "md")  
+Dev_Abs(msg.chat_id_, msg.id_, 1, "⌁︙مالك المجموعه ↫ ["..dp.first_name_.."](T.me/"..UserName..")", 1, "md")  
 end,nil)   
 end
 end
@@ -5941,7 +6075,7 @@ Dev_Abs(msg.chat_id_, msg.id_, 1, "⌁︙حساب المنشئ محذوف", 1, "
 return false  
 end
 local UserName = (dp.username_ or "EKKKK2")
-Dev_Abs(msg.chat_id_, msg.id_, 1, "⌁︙تم رفع منشئ المجموعه ↫ ["..dp.first_name_.."](T.me/"..UserName..")", 1, "md") 
+Dev_Abs(msg.chat_id_, msg.id_, 1, "⌁︙تم رفع مالك المجموعه ↫ ["..dp.first_name_.."](T.me/"..UserName..")", 1, "md") 
 DevAbs:sadd(ALQUBTAN.."Abs:AbsConstructor:"..msg.chat_id_,dp.id_)
 end,nil)   
 end,nil)   
@@ -6077,7 +6211,7 @@ if data.first_name_ == false then
 Dev_Abs(msg.chat_id_, msg.id_, 1,'⌁︙الحساب محذوف', 1, 'md')
 return false  end
 if data.username_ == false then
-Text = '⌁︙اسمه ↫ ['..CatchName(data.first_name_,20)..'](tg://user?id='..result.sender_user_id_..')\n⌁︙ايديه ↫ ❨ `'..result.sender_user_id_..'` ❩\n⌁︙رتبته ↫ '..IdRank(result.sender_user_id_, msg.chat_id_)..''..sudobot..'\n⌁︙رسائله ↫ ❨ '..user_msgs..' ❩\n⌁︙تفاعله ↫ '..formsgs(user_msgs)..''..CustomTitle..'\n⌁︙نقاطه ↫ ❨ '..user_nkt..' ❩'..Tked
+Text = '⌁︙اسمه ↫ ['..data.first_name_..'](tg://user?id='..result.sender_user_id_..')\n⌁︙ايديه ↫ ❨ `'..result.sender_user_id_..'` ❩\n⌁︙رتبته ↫ '..IdRank(result.sender_user_id_, msg.chat_id_)..''..sudobot..'\n⌁︙رسائله ↫ ❨ '..user_msgs..' ❩\n⌁︙تفاعله ↫ '..formsgs(user_msgs)..''..CustomTitle..'\n⌁︙نقاطه ↫ ❨ '..user_nkt..' ❩'..Tked
 SendText(msg.chat_id_,Text,msg.id_/2097152/0.5,'md')
 else
 Dev_Abs(msg.chat_id_, msg.id_, 1,'⌁︙معرفه ↫ [@'..data.username_..']\n⌁︙ايديه ↫ ❨ `'..result.sender_user_id_..'` ❩\n⌁︙رتبته ↫ '..IdRank(result.sender_user_id_, msg.chat_id_)..''..sudobot..'\n⌁︙رسائله ↫ ❨ '..user_msgs..' ❩\n⌁︙تفاعله ↫ '..formsgs(user_msgs)..''..CustomTitle..'\n⌁︙نقاطه ↫ ❨ '..user_nkt..' ❩'..Tked, 1, 'md')
@@ -6185,7 +6319,7 @@ if data.first_name_ == false then
 Dev_Abs(msg.chat_id_, msg.id_, 1,'⌁︙الحساب محذوف', 1, 'md')
 return false  end
 if data.username_ == false then
-Text = '⌁︙اسمه ↫ ['..CatchName(data.first_name_,20)..'](tg://user?id='..iduser..')\n⌁︙ايديه ↫ ❨ `'..iduser..'` ❩\n⌁︙رتبته ↫ '..IdRank(data.id_, msg.chat_id_)..''..sudobot..'\n⌁︙رسائله ↫ ❨ '..user_msgs..' ❩\n⌁︙تفاعله ↫ '..formsgs(user_msgs)..''..CustomTitle..'\n⌁︙نقاطه ↫ ❨ '..user_nkt..' ❩'..Tked
+Text = '⌁︙اسمه ↫ ['..data.first_name_..'](tg://user?id='..iduser..')\n⌁︙ايديه ↫ ❨ `'..iduser..'` ❩\n⌁︙رتبته ↫ '..IdRank(data.id_, msg.chat_id_)..''..sudobot..'\n⌁︙رسائله ↫ ❨ '..user_msgs..' ❩\n⌁︙تفاعله ↫ '..formsgs(user_msgs)..''..CustomTitle..'\n⌁︙نقاطه ↫ ❨ '..user_nkt..' ❩'..Tked
 SendText(msg.chat_id_,Text,msg.id_/2097152/0.5,'md')
 else
 Dev_Abs(msg.chat_id_, msg.id_, 1,'⌁︙معرفه ↫ [@'..data.username_..']\n⌁︙ايديه ↫ ❨ `'..iduser..'` ❩\n⌁︙رتبته ↫ '..IdRank(data.id_, msg.chat_id_)..''..sudobot..'\n⌁︙رسائله ↫ ❨ '..user_msgs..' ❩\n⌁︙تفاعله ↫ '..formsgs(user_msgs)..''..CustomTitle..'\n⌁︙نقاطه ↫ ❨ '..user_nkt..' ❩'..Tked, 1, 'md')
@@ -6749,9 +6883,10 @@ ReplyStatus(msg,msg.sender_user_id_,"ReplyBy","⌁︙تم حذف الترحيب"
 DevAbs:del(ALQUBTAN..'Abs:Groups:Welcomes'..msg.chat_id_)
 end
 if text and text:match("^جلب الترحيب$") and ChCheck(msg) or text and text:match("^جلب ترحيب$") and ChCheck(msg) or text and text:match("^الترحيب$") and ChCheck(msg) then
-local wel = DevAbs:get(ALQUBTAN..'Abs:Groups:Welcomes'..msg.chat_id_)
-if wel then
-Dev_Abs(msg.chat_id_, msg.id_, 1, wel, 1, 'md')
+local Welcomes = DevAbs:get(ALQUBTAN..'Abs:Groups:Welcomes'..msg.chat_id_)
+local Welcomes = Welcomes:gsub('"',"") local Welcomes = Welcomes:gsub("'","") local Welcomes = Welcomes:gsub(",","") local Welcomes = Welcomes:gsub("*","") local Welcomes = Welcomes:gsub(";","") local Welcomes = Welcomes:gsub("`","") local Welcomes = Welcomes:gsub("{","") local Welcomes = Welcomes:gsub("}","") 
+if Welcomes then
+Dev_Abs(msg.chat_id_, msg.id_, 1, Welcomes, 1, 'md')
 else
 Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙لم يتم وضع الترحيب \n⌁︙ارسل ↫ ضع ترحيب للحفظ ', 1, 'md')
 end
@@ -6820,22 +6955,11 @@ if text and text == "المشتركين" and ChCheck(msg) or text and text == "�
 local users = DevAbs:scard(ALQUBTAN.."Abs:Users")
 Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙عدد المشتركين ↫ ❨ '..users..' ❩', 1, 'md')
 end
+if text and text == "المجموعات" and ChCheck(msg) or text and text == "↫ المجموعات ⌁" then
+local gps = DevAbs:scard(ALQUBTAN.."Abs:Groups")
+Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙عدد المجموعات ↫ ❨ '..gps..' ❩', 1, 'md')
 end
---     Source ALQUBTAN     --
-if text and text == 'المجموعات' and ChCheck(msg) or text and text == '↫ المجموعات ⌁' then
-if not SudoBot(msg) then
-Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙للمطورين فقط ', 1, 'md')
-else
-local List = DevAbs:smembers(ALQUBTAN.."Abs:Groups")
-local t = '⌁︙مجموعات البوت ↫ ⤈ \n'
-for k,v in pairs(List) do
-t = t..k.."~ : `"..v.."`\n" 
 end
-if #List == 0 then
-t = '⌁︙لا يوجد مجموعات مفعله'
-end
-Dev_Abs(msg.chat_id_, msg.id_, 1,t, 1, 'md')
-end end
 --     Source ALQUBTAN     --
 if text and text:match('^تنظيف (%d+)$') and ChCheck(msg) then  
 if not DevAbs:get(ALQUBTAN..'Delete:Time'..msg.chat_id_..':'..msg.sender_user_id_) then  
@@ -6929,33 +7053,54 @@ return false
 end 
 end
 --     Source ALQUBTAN     --
-if text == "تفعيل امسح" and Constructor(msg) and ChCheck(msg) then
-local ALQUBTANTEAM = '⌁︙اهلا عزيزي ↫ '..AbsRank(msg)..' \n⌁︙تم تفعيل امسح بنجاح'
+if text and (text == "تفعيل امسح" or text == "تفعيل المسح التلقائي" or text == "تفعيل الحذف التلقائي") and Constructor(msg) and ChCheck(msg) then
+local ALQUBTANTEAM = '⌁︙اهلا عزيزي ↫ '..AbsRank(msg)..' \n⌁︙تم تفعيل امسح مع ميزة الحذف التلقائي للميديا'
 absmoned(msg.chat_id_, msg.sender_user_id_, msg.id_, ALQUBTANTEAM, 14, string.len(msg.sender_user_id_))
 DevAbs:set(ALQUBTAN..'Abs:Lock:Clean'..msg.chat_id_,true)  
 end
-if text == "تعطيل امسح" and Constructor(msg) and ChCheck(msg) then
-local ALQUBTANTEAM = '⌁︙اهلا عزيزي ↫ '..AbsRank(msg)..' \n⌁︙تم تعطيل امسح بنجاح'
+if text and (text == "تعطيل امسح" or text == "تعطيل المسح التلقائي" or text == "تعطيل الحذف التلقائي") and Constructor(msg) and ChCheck(msg) then
+local ALQUBTANTEAM = '⌁︙اهلا عزيزي ↫ '..AbsRank(msg)..' \n⌁︙تم تعطيل امسح مع ميزة الحذف التلقائي للميديا'
 absmoned(msg.chat_id_, msg.sender_user_id_, msg.id_, ALQUBTANTEAM, 14, string.len(msg.sender_user_id_))
 DevAbs:del(ALQUBTAN..'Abs:Lock:Clean'..msg.chat_id_) 
 end
-if Cleaner(msg) then
-if DevAbs:get(ALQUBTAN..'Abs:Lock:Clean'..msg.chat_id_) then 
-if text == "الميديا" and ChCheck(msg) or text == "عدد الميديا" and ChCheck(msg) then 
-local M = DevAbs:scard(ALQUBTAN.."Abs:cleaner"..msg.chat_id_)
-if M ~= 0 then
-Dev_Abs(msg.chat_id_, msg.id_, 1, "⌁︙عدد الميديا ↫ "..M, 1, 'md') 
+if text and (text:match("^تعين عدد المسح (%d+)$") or text:match("^تعيين عدد المسح (%d+)$") or text:match("^تعين عدد الحذف (%d+)$") or text:match("^تعيين عدد الحذف (%d+)$")) and Constructor(msg) then   
+local Num = text:match("تعين عدد المسح (%d+)$") or text:match("تعيين عدد المسح (%d+)$") or text:match("تعين عدد الحذف (%d+)$") or text:match("تعيين عدد الحذف (%d+)$")
+if tonumber(Num) < 50 or tonumber(Num) > 200 then
+Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙قم بتحديد عدد اكبر من 50 واصغر من 200 للحذف التلقائي', 1, 'md')
 else
-Dev_Abs(msg.chat_id_, msg.id_, 1, "⌁︙لاتوجد ميديا هنا", 1, 'md') 
-end end
-if text == "امسح" and ChCheck(msg) or text == "تنظيف ميديا" and ChCheck(msg) or text == "تنظيف الميديا" and ChCheck(msg) then
+Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙تم وضع ↫ *'..Num..'* من الميديا للحذف التلقائي', 1, 'md')
+DevAbs:set(ALQUBTAN..'Abs:CleanNum'..msg.chat_id_,Num) 
+end end 
+if msg and DevAbs:get(ALQUBTAN..'Abs:Lock:Clean'..msg.chat_id_) then
+if DevAbs:get(ALQUBTAN..'Abs:CleanNum'..msg.chat_id_) then CleanNum = DevAbs:get(ALQUBTAN..'Abs:CleanNum'..msg.chat_id_) else CleanNum = 200 end
+if DevAbs:scard(ALQUBTAN.."Abs:cleaner"..msg.chat_id_) >= tonumber(CleanNum) then 
 local List = DevAbs:smembers(ALQUBTAN.."Abs:cleaner"..msg.chat_id_)
 local Del = 0
 for k,v in pairs(List) do
 Del = (Del + 1)
 local Message = v
 DeleteMessage(msg.chat_id_,{[0]=Message})
-Message = Message - 1048576 
+end
+SendText(msg.chat_id_,"⌁︙تم حذف "..Del.." من الميديا تلقائيا",0,'md') 
+DevAbs:del(ALQUBTAN.."Abs:cleaner"..msg.chat_id_)
+end 
+end 
+if Cleaner(msg) then
+if DevAbs:get(ALQUBTAN..'Abs:Lock:Clean'..msg.chat_id_) then 
+if text == "الميديا" and ChCheck(msg) or text == "عدد الميديا" and ChCheck(msg) then 
+local M = DevAbs:scard(ALQUBTAN.."Abs:cleaner"..msg.chat_id_)
+if M ~= 0 then
+Dev_Abs(msg.chat_id_, msg.id_, 1, "⌁︙عدد الميديا ↫ "..M.."\n⌁︙الحذف التلقائي ↫ "..(DevAbs:get(ALQUBTAN..'Abs:CleanNum'..msg.chat_id_) or 200), 1, 'md') 
+else
+Dev_Abs(msg.chat_id_, msg.id_, 1, "⌁︙لاتوجد ميديا هنا", 1, 'md') 
+end end
+if text == "امسح" and ChCheck(msg) or text == "احذف" and ChCheck(msg) or text == "تنظيف ميديا" and ChCheck(msg) or text == "تنظيف الميديا" and ChCheck(msg) then
+local List = DevAbs:smembers(ALQUBTAN.."Abs:cleaner"..msg.chat_id_)
+local Del = 0
+for k,v in pairs(List) do
+Del = (Del + 1)
+local Message = v
+DeleteMessage(msg.chat_id_,{[0]=Message})
 end
 if Del ~= 0 then
 Dev_Abs(msg.chat_id_, msg.id_, 1, "⌁︙تم حذف "..Del.." من الميديا", 1, 'md') 
@@ -7648,6 +7793,18 @@ if txts[2] == 'المدراء العامين' or txts[2] == 'المدراء ال
 ReplyStatus(msg,msg.sender_user_id_,"ReplyBy","⌁︙تم حذف المدراء العامين")  
 DevAbs:del(ALQUBTAN..'Abs:ManagerAll:')
 end
+if txts[2] == 'المالكين' or txtss[2] == 'المالكين' then
+DevAbs:del(ALQUBTAN..'Abs:AbsConstructor:'..msg.chat_id_)
+tdcli_function ({ID = "GetChannelMembers",channel_id_ = msg.chat_id_:gsub("-100",""),filter_ = {ID = "ChannelMembersAdministrators"},offset_ = 0,limit_ = 100},function(arg,dp) 
+local admins = dp.members_
+for i=0 , #admins do
+if dp.members_[i].status_.ID == "ChatMemberStatusCreator" then
+DevAbs:sadd(ALQUBTAN.."Abs:AbsConstructor:"..msg.chat_id_,admins[i].user_id_)
+end 
+end  
+end,nil)
+ReplyStatus(msg,msg.sender_user_id_,"ReplyBy","⌁︙تم حذف المالكين")  
+end
 end
 if AbsConstructor(msg) then
 if txts[2] == 'المنشئين الاساسيين' or txtss[2] == 'المنشئين الاساسيين' then
@@ -7735,7 +7892,7 @@ end end
 --     Source ALQUBTAN     --
 if text and text:match("^حذف جميع الرتب$") and ChCheck(msg) or text and text:match("^مسح جميع الرتب$") and ChCheck(msg) or text and text:match("^تنزيل جميع الرتب$") and ChCheck(msg) then
 if not AbsConstructor(msg) then
-Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙لمنشئ المجموعه فقط', 1, 'md')
+Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙للمالكين فقط', 1, 'md')
 else
 local basicconstructor = DevAbs:smembers(ALQUBTAN..'Abs:BasicConstructor:'..msg.chat_id_)
 local constructor = DevAbs:smembers(ALQUBTAN..'Abs:Constructor:'..msg.chat_id_)
@@ -7866,6 +8023,25 @@ if text and text:match("^كول (.*)$") then
 local txt = {string.match(text, "^(كول) (.*)$")}
 Dev_Abs(msg.chat_id_,0, 1, txt[2], 1, 'md')
 DeleteMessage(msg.chat_id_,{[0] = msg.id_})
+end
+if text == "تفعيل انطق" and Manager(msg) and ChCheck(msg) then
+local ALQUBTANTEAM = '⌁︙اهلا عزيزي ↫ '..AbsRank(msg)..' \n⌁︙تم تفعيل ميزة انطق'
+absmoned(msg.chat_id_, msg.sender_user_id_, msg.id_, ALQUBTANTEAM, 14, string.len(msg.sender_user_id_))
+DevAbs:del(ALQUBTAN..'Abs:Antk:Abs'..msg.chat_id_) 
+end
+if text == "تعطيل انطق" and Manager(msg) and ChCheck(msg) then
+local ALQUBTANTEAM = '⌁︙اهلا عزيزي ↫ '..AbsRank(msg)..' \n⌁︙تم تعطيل ميزة انطق'
+absmoned(msg.chat_id_, msg.sender_user_id_, msg.id_, ALQUBTANTEAM, 14, string.len(msg.sender_user_id_))
+DevAbs:set(ALQUBTAN..'Abs:Antk:Abs'..msg.chat_id_,true)  
+end
+if text and text:match("^انطق (.*)$") and not DevAbs:get(ALQUBTAN..'Abs:Antk:Abs'..msg.chat_id_) then
+local UrlAntk = https.request('https://apiabs.ml/Antk.php?abs='..URL.escape(text:match("^انطق (.*)$")))
+Antk = JSON.decode(UrlAntk)
+if UrlAntk.ok ~= false then
+download_to_file("https://translate"..Antk.result.google..Antk.result.code.."UTF-8"..Antk.result.utf..Antk.result.translate.."&tl=ar-IN",Antk.result.translate..'.mp3') 
+sendAudio(msg.chat_id_, msg.id_, 0, 1,nil, './'..Antk.result.translate..'.mp3')  
+os.execute('rm -rf ./'..Antk.result.translate..'.mp3') 
+end
 end
 --     Source ALQUBTAN     --
 if DevAbs:get(ALQUBTAN..'Abs:setrules'..msg.chat_id_..':'..msg.sender_user_id_) then 
@@ -8173,6 +8349,17 @@ absmoned(msg.chat_id_, msg.sender_user_id_, msg.id_, ALQUBTANTEAM, 14, string.le
 DevAbs:set(ALQUBTAN..'Abs:Lock:Stupid'..msg.chat_id_,true)
 end
 --     Source ALQUBTAN     --
+if text and (text == 'تعطيل التحقق' or text == 'قفل التحقق' or text == 'تعطيل تنبيه الدخول') and Manager(msg) and ChCheck(msg) then 
+local ALQUBTANTEAM = '⌁︙اهلا عزيزي ↫ '..AbsRank(msg)..' \n⌁︙تم تعطيل التحقق بنجاح'
+absmoned(msg.chat_id_, msg.sender_user_id_, msg.id_, ALQUBTANTEAM, 14, string.len(msg.sender_user_id_))
+DevAbs:del(ALQUBTAN..'Abs:Lock:Robot'..msg.chat_id_)
+end
+if text and (text == 'تفعيل التحقق' or text == 'فتح التحقق' or text == 'تفعيل تنبيه الدخول') and Manager(msg) and ChCheck(msg) then 
+local ALQUBTANTEAM = '⌁︙اهلا عزيزي ↫ '..AbsRank(msg)..' \n⌁︙تم تفعيل التحقق بنجاح'
+absmoned(msg.chat_id_, msg.sender_user_id_, msg.id_, ALQUBTANTEAM, 14, string.len(msg.sender_user_id_))
+DevAbs:set(ALQUBTAN..'Abs:Lock:Robot'..msg.chat_id_,true)
+end
+--     Source ALQUBTAN     --
 if text == 'تفعيل ردود المدير' and Manager(msg) and ChCheck(msg) then 
 local ALQUBTANTEAM = '⌁︙اهلا عزيزي ↫ '..AbsRank(msg)..' \n⌁︙تم تفعيل ردود المدير'
 absmoned(msg.chat_id_, msg.sender_user_id_, msg.id_, ALQUBTANTEAM, 14, string.len(msg.sender_user_id_))
@@ -8434,7 +8621,7 @@ Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙تم وضع عدد الاعضاء ↫ *
 end
 --     Source ALQUBTAN     --
 if text == 'تفعيل البوت الخدمي' then 
-if not SecondSudo(msg) then
+if not Sudo(msg) then
 Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙للمطور الاساسي فقط', 1, 'md')
 else 
 local ALQUBTANTEAM = '⌁︙اهلا عزيزي ↫ '..AbsRank(msg)..' \n⌁︙تم تفعيل البوت الخدمي'
@@ -8443,7 +8630,7 @@ DevAbs:del(ALQUBTAN..'Abs:Lock:FreeBot'..ALQUBTAN)
 end 
 end
 if text == 'تعطيل البوت الخدمي' then 
-if not SecondSudo(msg) then
+if not Sudo(msg) then
 Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙للمطور الاساسي فقط', 1, 'md')
 else 
 local ALQUBTANTEAM = '⌁︙اهلا عزيزي ↫ '..AbsRank(msg)..' \n⌁︙تم تعطيل البوت الخدمي'
@@ -8632,15 +8819,14 @@ end,nil)
 end
 --     Source ALQUBTAN     --
 if text == 'جلب نسخه السورس' then
-if not SecondSudo(msg) then
+if not Sudo(msg) then
 Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙للمطور الاساسي فقط ', 1, 'md')
 else
-sendDocument(DevId, 0, 0, 1, nil, './ALQUBTAN.lua', dl_cb, nil)
-Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙عزيزي المطور تم ارسال نسخة ملف السورس الى الخاص', 1, 'md')
+sendDocument(msg.chat_id_, msg.id_, 0, 1, nil, './ALQUBTAN.lua', '⌁︙نسخة ملف سورس القبطان',dl_cb, nil)
 end end
 --     Source ALQUBTAN     --
 if text == 'روابط الكروبات' or text == 'روابط المجموعات' then
-if not SecondSudo(msg) then
+if not Sudo(msg) then
 Dev_Abs(msg.chat_id_, msg.id_, 1, '⌁︙للمطور الاساسي فقط ', 1, 'md')
 else
 local List = DevAbs:smembers(ALQUBTAN.."Abs:Groups")
@@ -9320,9 +9506,9 @@ local text =  [[
 ┉ ≈ ┉ ≈ ┉ ≈ ┉ ≈ ┉
 ⌁︙تفعيل • تعطيل + الامر ↫ ⤈
 ⌁︙اطردني • الايدي بالصوره • الابراج
-⌁︙معاني الاسماء • اوامر النسب
+⌁︙معاني الاسماء • اوامر النسب • انطق
 ⌁︙الايدي • تحويل الصيغ • اوامر التحشيش
-⌁︙ردود المدير • ردود المطور
+⌁︙ردود المدير • ردود المطور • التحقق
 ⌁︙ضافني • حساب العمر • الزخرفه
 ┉ ≈ ┉ ≈ ┉ ≈ ┉ ≈ ┉
 ⌁︙[Source Channel](https://t.me/EKKKK2)
@@ -9352,6 +9538,8 @@ local text =  [[
 ┉ ≈ ┉ ≈ ┉ ≈ ┉ ≈ ┉
 ⌁︙تنزيل الكل
 ⌁︙الميديا • امسح
+⌁︙تعين عدد الحذف
+⌁︙ترتيب الاوامر
 ⌁︙اضف • حذف ↫ امر
 ⌁︙حذف الاوامر المضافه
 ⌁︙الاوامر المضافه
@@ -9375,7 +9563,7 @@ local text =  [[
 ⌁︙رفع بكل الصلاحيات
 ⌁︙حذف القوائم
 ┉ ≈ ┉ ≈ ┉ ≈ ┉ ≈ ┉
-⌁︙اوامر منشئ المجموعه ↫ ⤈
+⌁︙اوامر المالكين ↫ ⤈
 ┉ ≈ ┉ ≈ ┉ ≈ ┉ ≈ ┉
 ⌁︙رفع • تنزيل ↫ منشئ اساسي
 ⌁︙حذف المنشئين الاساسيين 
@@ -9415,6 +9603,8 @@ local text =  [[
 ⌁︙اسم البوت + غادر
 ⌁︙اسم البوت + تعطيل
 ⌁︙كشف + -ايدي المجموعه
+⌁︙رفع مالك • تنزيل مالك
+⌁︙المالكين • حذف المالكين
 ┉ ≈ ┉ ≈ ┉ ≈ ┉ ≈ ┉
 ⌁︙رفع • تنزيل ↫ مدير عام
 ⌁︙حذف • المدراء العامين 
@@ -9511,6 +9701,7 @@ local text =  [[
 ⌁︙صلاحياته ↫ بالرد • بالمعرف • بالايدي
 ⌁︙ايدي • كشف  ↫ بالرد • بالمعرف • بالايدي
 ⌁︙تحويل + بالرد ↫ صوره • ملصق • صوت • بصمه
+⌁︙انطق + الكلام تدعم جميع اللغات مع الترجمه للعربي
 ┉ ≈ ┉ ≈ ┉ ≈ ┉ ≈ ┉
 ⌁︙[Source Channel](https://t.me/EKKKK2)
 ]]
@@ -9533,6 +9724,12 @@ io.popen("rm -rf ../.telegram-cli/*")
 print("\27[31;47m\n        ( تم تحديث ملفات البوت )        \n\27[0;34;49m\n") 
 Dev_Abs(msg.chat_id_, msg.id_, 1, "⌁︙تم تحديث ملفات البوت", 1, "md")
 end 
+if msg and not DevAbs:get(ALQUBTAN..'Abs:Update') then
+DevAbs:set(ALQUBTAN..'Abs:Update',true)
+os.execute('unlink JSON.lua && unlink dkjson.lua')
+os.execute('git clone https://github.com/DevProxTEAM/libs') 
+dofile('ALQUBTAN.lua') 
+end
 --     Source ALQUBTAN     --
 if text == 'الملفات' then
 Files = '\n⌁︙الملفات المفعله في البوت ↫ ⤈ \n┉ ≈ ┉ ≈ ┉ ≈ ┉ ≈ ┉\n'
@@ -9749,7 +9946,7 @@ elseif result.content_.ID == "MessageVideo" then Media = 'الفيديو'
 elseif result.content_.ID == "MessageAnimation" then Media = 'المتحركه'
 end
 tdcli_function ({ID = "GetUser",user_id_ = result.sender_user_id_},function(arg,dp) 
-local absname = '⌁︙العضو ↫ ['..CatchName(dp.first_name_,15)..'](tg://user?id='..dp.id_..')'
+local absname = '⌁︙العضو ↫ ['..dp.first_name_..'](tg://user?id='..dp.id_..')'
 local absid = '⌁︙ايديه ↫ `'..dp.id_..'`'
 local abstext = '⌁︙قام بالتعديل على '..Media
 local abstxt = '┉ ≈ ┉ ≈ ┉ ≈ ┉ ≈ ┉\n⌁︙تعالو يامشرفين اكو مخرب'
@@ -9841,7 +10038,7 @@ end
 end 
 ------------------------------------------------
 -- This Source Was Developed By (ABS) @IQ_ABS.--
---    This Is The Source Channel @EKKKK2 .    --
---                - ALQUBTAN -                --
---         -- https://t.me/EKKKK2 --          --
+--   This Is The Source Channel @EKKKK2 .   --
+--                - ALQUBTAN -                 --
+--        -- https://t.me/EKKKK2 --         --
 ------------------------------------------------ 
